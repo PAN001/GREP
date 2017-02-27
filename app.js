@@ -206,6 +206,7 @@ function useUpload($http, $rootScope) {
   p.submit = function() {
     console.log('pic submit activated');
     rt.waiting = true;
+    rt.toHide = true;
     if (validfile) {
       console.log('sending file');
       $http({
@@ -217,18 +218,20 @@ function useUpload($http, $rootScope) {
           crop_image: true
         }
       }).then(function success(data) {
-        console.log(data);
-        rt.waiting = false;
-        rt.useUpload = false;
-        rt.results_received = true;
-        rt.results = data.data
-        rt.original = loadedPhoto;
+          console.log(data);
+          rt.waiting = false;
+          rt.useUpload = false;
+          rt.results_received = true;
+          rt.results = data.data
+          rt.original = loadedPhoto;
       }, function fail(data) {
-        console.log('error: ', data);
+          console.log('error: ', data);
+          rt.waiting = false;
+          rt.error = true;
       })
     } else {
-      console.log('invalid');
-      p.invalid = true;
+        console.log('invalid');
+        p.invalid = true;
     }
   }
 
@@ -281,6 +284,7 @@ function useURL($http, $rootScope) {
   u.submit = function() {
     console.log(u.url)
     rt.waiting = true;
+    rt.toHide = true;
     $http({
       method: 'POST',
       url: serverAddress + ':5000/v1.0.0/predict',
@@ -298,7 +302,9 @@ function useURL($http, $rootScope) {
       rt.original = u.url
       console.log(rt.original);
     }, function fail(data) {
-      console.log('error: ', data);
+        console.log('error: ', data);
+        rt.waiting = false;
+        rt.error = true;
     })
   }
 }

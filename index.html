@@ -21,7 +21,7 @@
     <div class="container-fluid">
       <ul ng-hide="nav" class="nav navbar-nav">
         <li class="pull-left">
-          <a href="/">
+          <a href="./index.html">
             <img class="supersmall" src="graphics/little-white-brain.svg">
           </a>
         </li>
@@ -67,7 +67,11 @@
       <h1 ng-show="waiting" class="text-center blue">Loading Results...</h1>
       <img ng-show="waiting" class="logo-big img-responsive center-block" src="graphics/brain2.gif">
     </main>
-    <main class="display full-height" ng-hide="waiting">
+
+    <h1 ng-show="error" class="text-center blue">Server error occurs</h1>
+    <img ng-show="error" class="logo-big img-responsive center-block" src="graphics/brain2.gif">
+
+    <main class="display full-height" ng-hide="toHide">
       <div class="container">
         <div class="col-md-4 col-md-offset-4">
           <form ng-submit="p.submit()">
@@ -95,9 +99,13 @@
 
   <div ng-if="useURL" ng-controller="useURL as u">
     <main>
-      <h1 ng-show="waiting" class="text-center blue">Loading Results...</h1>
-      <img ng-show="waiting" class="logo-big img-responsive center-block" src="graphics/brain2.gif">
-      <div class="display full-height" ng-hide="waiting">
+        <h1 ng-show="waiting" class="text-center blue">Loading Results...</h1>
+        <img ng-show="waiting" class="logo-big img-responsive center-block" src="graphics/brain2.gif">
+        
+        <h1 ng-show="error" class="text-center blue">Server error occurs</h1>
+        <img ng-show="error" class="logo-big img-responsive center-block" src="graphics/brain2.gif">
+        
+      <div class="display full-height" ng-hide="toHide">
             <form class="col-md-4" name="sendURL" ng-submit="u.submit()">
               <div class="form-group" ng-class="{'has-error': sendURL.url.$invalid && !sendURL.url.$pristine, 'has-success': sendURL.url.$valid}">
 
@@ -165,7 +173,7 @@
         <p>DOWNLOAD</p>
       </div>
       <div>
-        <a href="/">
+        <a href="./index.html"">
           <img src="graphics/retake_button.svg" class="navbutton">
         </a>
         <p>MEME AGAIN</p>
@@ -175,7 +183,7 @@
     <div class="container">
       <div ng-if="res.nofaces">
         <div class="bc">
-          <a href="/">
+          <a href="./index.html"">
             <img class="navbutton" src="graphics/retake_button.svg">
           </a>
         </div>
@@ -235,14 +243,14 @@
       <div class="col-md-5">
         <div class="row">
           <div class="col-md-5">
-            <a href="https://github.com/JostineHo/Mememoji">
+            <a href="https://github.com/PAN001/GREP">
               <img class="avatar" src="graphics/little-white-brain.svg" alt="">
             </a>
           </div>
           <div class="col-md-7">
             <p><strong>GRoup Emotion Parser (GREP)</strong> is an interactive emotion recognition system that detects emotions based on facial expressions from image of group of people. The core of the app is a deep convolutional neural network that predicts the compositions of the emotions expressed by the group.
             </p>
-            <p>For the technology used behind the application, please visit: <a href="https://github.com/JostineHo/Mememoji">github.com/JostineHo/Mememoji</a>.</p>
+            <p>For the technology used behind the application, please visit: <a href="https://github.com/PAN001/GREP">github.com/PAN001/GREP</a></p>
             </div>
 <!--           <div class="col-md-5">
             <a href="http://www.galvanize.com/courses/data-science">
