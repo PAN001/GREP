@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 63 63" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <g transform="matrix(1,0,0,1,-2564.4,-1207.54)">
+        <g transform="matrix(1.2549,0,0,1,-156.824,341.061)">
+            <g id="fear" transform="matrix(0.834933,0,0,0.828571,531.861,168.089)">
+                <g transform="matrix(4.87945e-17,-1,0.796875,6.12323e-17,1289.11,2846.88)">
+                    <circle cx="1966.5" cy="879.617" r="37.5" style="fill:url(#_Linear1);"/>
+                </g>
+                <g transform="matrix(0.796875,0,0,1,356.067,2.63727)">
+                    <path d="M2038,892C2042.79,892.435 2046.9,896.833 2052,896C2053.73,895.718 2056.55,893.897 2058,893C2061.31,890.946 2063.07,889.267 2066.88,891.938C2067.89,892.652 2068.57,893.836 2069,895C2069.37,895.978 2069.36,897.096 2069.19,898.125C2068.64,901.437 2066.33,903.952 2063,904C2061,904.029 2054.86,902.084 2053,902C2047.23,901.738 2042.46,906.118 2037,903C2035.58,902.186 2033.74,899.581 2033.66,897.786C2033.58,895.774 2035.48,891.771 2038,892" style="fill:black;"/>
+                </g>
+                <g transform="matrix(0.724432,0,0,0.7,500.881,265.637)">
+                    <path d="M2037.5,870C2042.74,867.024 2044.23,870.198 2044.1,875.714C2043.81,887.662 2040.54,890 2037.5,890C2034.46,890 2031.13,882.654 2030.9,877.143C2030.72,872.814 2034.72,871.581 2037.5,870Z" style="fill:black;"/>
+                </g>
+                <g transform="matrix(-0.724432,0,0,0.7,3479.23,265.037)">
+                    <path d="M2037.5,870C2042.74,867.024 2044.23,870.198 2044.1,875.714C2043.81,887.662 2040.54,890 2037.5,890C2034.46,890 2031.13,882.654 2030.9,877.143C2030.72,872.814 2034.72,871.581 2037.5,870Z" style="fill:black;"/>
+                </g>
+            </g>
+        </g>
+    </g>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(75,0,0,75,1929,879.617)"><stop offset="0%" style="stop-color:rgb(253,215,75);stop-opacity:1"/><stop offset="100%" style="stop-color:rgb(33,137,206);stop-opacity:1"/></linearGradient>
+    </defs>
+</svg>

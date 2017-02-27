@@ -1,0 +1,145 @@
+.logo-big {
+  max-height: 60%;
+  padding-top: 40px; }
+
+@font-face {
+  font-family: 'crazy';
+  src: url("../fonts/CrazyType/CrazyType.ttf"); }
+.logo {
+  color: #E9B53A;
+  font-family: 'crazy'; }
+
+.logonav {
+  color: #E9B53A;
+  font-family: 'crazy';
+  text-align: center;
+  padding-top: 9px;
+  margin: 0 auto; }
+
+.big {
+  padding-top: 20px;
+  font-size: 7em; }
+
+.med {
+  font-size: 2em;
+  width: 50%; }
+
+body {
+  background-color: #F35946;
+  border-top: 20px solid #F2F2F2; }
+
+.navbutton {
+  width: 150px;
+  height: 150px;
+  margin: -40px 1rem 0 1rem;
+  position: relative;
+  display: flex;
+  justify-content: center; }
+  .navbutton:hover {
+    cursor: pointer; }
+  @media (max-width: 768px) {
+    .navbutton {
+      width: 90px;
+      height: 90px;
+      margin: -20px 1rem 0 1rem; } }
+
+.bc {
+  display: flex;
+  justify-content: center;
+  background-color: #F35946; }
+  .bc p {
+    text-align: center;
+    color: #F2F2F2; }
+
+.navs {
+  background-color: #F35946;
+  position: absolute;
+  width: 100%;
+  height: 175px;
+  bottom: 0; }
+
+.vid {
+  padding-top: 70px;
+  margin-bottom: 60px; }
+
+.supersmall {
+  height: 30px; }
+
+.emoji {
+  width: 25px;
+  height: 25px; }
+
+.bigger {
+  width: 50px;
+  height: 50px; }
+
+.display {
+  display: flex;
+  justify-content: space-around;
+  align-items: center; }
+
+.vert {
+  display: flex;
+  flex-direction: column;
+  align-items: center; }
+
+.preview {
+  height: 50px; }
+
+.full-height {
+  min-height: 80%;
+  min-height: 80vh; }
+
+.tn {
+  height: 75px;
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.4); }
+
+.og {
+  margin-top: 90px;
+  margin-bottom: 25px;
+  margin-right: 20px;
+  margin-left: 20px; }
+
+.rel {
+  position: relative; }
+
+.abs {
+  position: absolute; }
+
+.correct a {
+  font-size: 2em; }
+  .correct a:hover {
+    cursor: pointer; }
+
+.blue {
+  color: #53b3cb;
+  padding-top: 40px; }
+
+main {
+  height: 75vh;
+  background-color: #F2F2F2; }
+
+.result {
+  min-height: 50vh;
+  background-color: #F2F2F2;
+  clear: both; }
+
+footer {
+  padding-top: 100px;
+  margin-bottom: 100px;
+  background-color: #F35946; }
+  footer a {
+    color: #F2F2F2; }
+    footer a:hover {
+      color: #E9B53A; }
+  footer .avatar {
+    height: 150px; }
+    footer .avatar:hover {
+      border-color: #E9B53A; }
+  footer .profile {
+    border-radius: 50%;
+    border: 5px solid #F2F2F2; }
+  footer .link {
+    margin-bottom: 10px; }
+
+/*# sourceMappingURL=site.css.map */
