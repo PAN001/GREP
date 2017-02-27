@@ -1,2 +1,0 @@
-# GREP
-GRoup Emotion Parser
