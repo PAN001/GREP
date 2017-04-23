@@ -36,28 +36,42 @@ In this project, we demonstrate the efficacy of our proposed random recurrent de
 ### 2.3 Database: HAPPEI
 The database used in the experiment is the HAPpy PEople Images (HAPPEI) database \cite{dhall2015automatic}, which is a fully annotated database (by human labelers) for the task of group happiness level prediction. Images in this database are collected from Flicker by using a Matlab based program that automatically searches particular images associated with groups of people and predefined events. For those downloaded images, a Viola-Jones object detector trained on different data is executed on the images. Only images containing more than one subject were kept. Figure 2.1 shows a collage of images from the HAPPEI database.
 <p align="center">
-<img src="img/HAPPEI_sample.jpg" width="500" align="middle"/>
+<img src="img/HAPPEI_sample.jpg" width="600" align="middle"/>
 <h4 align="center"> Figure 2.1 A collage of images from the HAPPEI database.</h4>
 </p>
 
 Every image in the data set is given a label between [0, 5]. These six discrete numbers correspond to six stages of happiness: Neutral, Small Smile, Large Smile, Small Laugh, Large Laugh and Thrilled, as shown in Figure 2.2. During the manual labelling stage, if the teeth of a member of a group were visible, the face was often labelled as a \emph{Laugh} (happiness intensity ranges from 3 to 4). If the mouth was open wide, the face was labelled as \emph{Thrilled} (of happiness intensity 5). A face with a closed mouth was assigned the label \emph{Smile} (happiness intensity ranges from 1 to 2). \cite{dhall2015automatic} The LabelMe \cite{russell2008labelme} based annotation tool was also used for labelling.
-	\begin{figure}[h!]
-		\centering
-		\includegraphics[width=1.0\linewidth]{img/HAPPEI.png}
-		\caption{{\bf Samples in HAPPEI database}}
-		\floatfoot{The HAPPEI database is a highly unbalanced database, with most of the faces/groups labelled as 3, but very few of them labelled as 0 or 5.}
-	\end{figure}
-	
-## Background Knowledge
-### Feed-forward Neural Network
-It is necessary to describe the basic feed-forward neural network before investigating into the more complex convolutional neural network. A detailed discussion of feed-forward neural network could be found in \cite{bishop2006pattern}.  Given a supervised learning scenario and a set of labeled data a neural network offers a way of representing a nonlinear function $h_W (x)$ of input vector variable x.  The function $h_W (x)$ is parameterized by a weights matrix $W$ that can be tuned to fit our data. Figure x shows a simple neural network architecture which consists of two input units or neurons.
-
-		
-## 3 The Model
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/mrbean.png" width="200" align="middle"/>
-<h4 align="center"> Figure 3. Mr. Bean, the model for the model.</h4>
+<img src="img/HAPPEI.png" width="600" align="middle"/>
+<h4 align="center"> Figure 2.2 Samples in HAPPEI database.</h4>
 </p>
+	
+## 3. Background Knowledge
+### 3.1 Feed-forward Neural Network
+It is necessary to describe the basic feed-forward neural network before investigating into the more complex convolutional neural network. A detailed discussion of feed-forward neural network could be found in \cite{bishop2006pattern}.  Given a supervised learning scenario and a set of labeled data a neural network offers a way of representing a nonlinear function $h_W (x)$ of input vector variable x.  The function $h_W (x)$ is parameterized by a weights matrix $W$ that can be tuned to fit our data. Figure x shows a simple neural network architecture which consists of two input units or neurons.
+<p align="center">
+<img src="img/feedforward_NN.png" width="500" align="middle"/>
+<h4 align="center"> Figure 3.1 Typical feed-forward neural network architecture.</h4>
+</p>
+
+### 3.2 Convolutional Neural Network
+A convolutional neural network is a type of feed-forward neural network where the connectivity between neurons conforms to the organization of the animal visual cortex. There are three principal factors that distinguish the CNN from the simple feed-forward neural networks: local receptive fields, weight sharing, and spatial pooling or subsampling layers. Figure 3.2 shows a typical example of max pooling.
+<p align="center">
+<img src="img/CNN_pooling.png" width="500" align="middle"/>
+<h4 align="center"> Figure 3.2 Typical max pooling layer in CNN.</h4>
+</p>
+		
+In a typical CNN, there are multiple layers, alternating between convolution and pooling. From an intuitive perspective, the low-level convolutional filters, such as those in the first convolutional layer, can be thought of low-level enco ding of the input data. In terms of the image as input, these low-level filters may consist of simple edge filters. As for those higher layers in the neural network, the CNN begins to learn more and more complicated structures. With multiple layers and a large number of filters, the CNN architecture is capable of extracting powerful representation of input data.
+
+### 3.3 Recurrent Neural Network: Long-Short Term Memory
+Long short-term memory (LSTM) is a special kind of RNN architecture proposed in 1997 \cite{hochreiter1997long}. LSTMs are explicitly designed to deal with the long-term dependency problem. All RNNS have the form of a chain of repeating modules of neural network. In standard RNNs, this repeating module has a very simple structure, such as a single tanh layer.
+<p align="center">
+<img src="img/LSTM-SimpleRNN.png" width="300" align="middle"/>
+<h4 align="center"> Figure 3.3 The single-layer repeating module in a standard RNN.</h4>
+</p>
+
+## 3 The Model
+
 
 Deep learning is a popular technique used in computer vision. I chose convolutional neural network (CNN) layers as building blocks to create my model architecture. CNNs are known to imitate how the human brain works when analyzing visuals. I will use a picture of Mr. Bean as an example to explain how images are fed into the model, because who doesn’t love Mr. Bean?
 
