@@ -16,9 +16,9 @@
 4. [Our Approach and Methodology](#4-our-approach-and-methodology)
 	* [4.1 Face Detection](#41-face-detection)
 	* [4.2 Residual Network (ResNet)](#42-residual-network-resnet)
-	* [4.3 Random Recurrent Deep Ensembles (RRDE)](#43-random-recurrent-deep-ensembles-(rrde))
+	* [4.3 Random Recurrent Deep Ensembles (RRDE)](#43-random-recurrent-deep-ensembles-rrde)
 	* [4.4 LSTM based Feature Aggregation](#44-lstm-based-feature-aggregation)
-	* [4.5 Group Emotion Model (GEM)](#45-group-emotion-model-(gem))
+	* [4.5 Group Emotion Model (GEM)](#45-group-emotion-model-gem)
 5. [Experiments](#5-experiments)
 	* [5.1 Facial Feature Extraction](#51-facial-feature-extraction)
 	* [5.2 Facial Feature Aggregation](#52-facial-feature-aggregation)
@@ -163,6 +163,6 @@ For demonstration and future research purpose, a set of RESTful APIs and an inte
 
 ## 7 About the Author
 
-**Yichen PAN** is a data scientist who loves building intelligent applications and exploring the exciting possibilities using deep learning. She is interested in computer vision and automation that creates innovative solutions to real-world problems. She holds a masters degree in Petroleum & Geosystems Engineering at The University of Texas at Austin. You can reach her on [LinkedIn](https://www.linkedin.com/in/jostinefho).
+**Yichen PAN** is an undergraduate student at University of Nottingham Ningbo China, and master candidate at Carnegie Mellon University. He has been devoted to being computer scientist since the university. Constantly involved in interdisciplinary research in computer science. Interested in programable data collection, process and analysis, machine learning, NLP and deep learning. Experienced in application development.[LinkedIn](https://www.linkedin.com/in/yichen-pan-512399a7/).
 
 ## 8 References
