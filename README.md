@@ -1,4 +1,4 @@
-<img src="" alt="alt text" align="middle"/>
+<img src="img/app_name.png" alt="alt text" align="middle"/>
 
 <p align="center"><i>Feature Extraction via Random Recurrent Deep Ensembles and its Application in Group-level Happiness Estimation</i></p>
 
