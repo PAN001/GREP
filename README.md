@@ -163,7 +163,11 @@ For demonstration and future research purpose, a set of RESTful APIs and an inte
 
 ## 7 About the Author
 
-**Yichen PAN** is an undergraduate student at University of Nottingham Ningbo China, and master candidate at Carnegie Mellon University. He has been devoted to being computer scientist since the university. Constantly involved in interdisciplinary research in computer science. Interested in programable data collection, process and analysis, machine learning, NLP and deep learning. Experienced in application development.[LinkedIn](https://www.linkedin.com/in/yichen-pan-512399a7/).
+**Yichen PAN** is an undergraduate student at University of Nottingham Ningbo China, and master candidate at Carnegie Mellon University. He has been devoted to being computer scientist since the university. Constantly involved in interdisciplinary research in computer science. Interested in programable data collection, process and analysis, machine learning, NLP and deep learning. Experienced in application development.
+
+[LinkedIn](https://www.linkedin.com/in/yichen-pan-512399a7/) 
+
+[Website](http://panatopos.com)
 
 ## 8 References
 [1] Bishop, C. M. Pattern recognition. Machine Learning 128 (2006), 1–58.
