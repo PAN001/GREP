@@ -12,7 +12,7 @@
 3. [Background Knowledge](#3-background-knowledge)
 	* [3.1 Feed-forward Neural Network](#31-feed-forward-neural-network)
 	* [3.2 Convolutional Neural Network](#32-convolutional-neural-network)
-	* [3.3 Recurrent Neural Network: Long-Short Term Memory](#33-recurrent-neural-network:-long-short-term-memory)
+	* [3.3 Recurrent Neural Network: Long-Short Term Memory](#33-recurrent-neural-network-long-short-term-memory)
 4. [Our Approach and Methodology](#4-our-approach-and-methodology)
 	* [4.1 Face Detection](#41-face-detection)
 	* [4.2 Residual Network (ResNet)](#42-residual-network-resnet)
