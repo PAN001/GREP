@@ -4,24 +4,29 @@
 
 
 ## Table of Contents
-1. [Abstract](#1-motivation)
-2. [The Database](#2-the-database)
-3. [The Model](#3-the-model)
-	* [3.1 Input Layer](#31-input-layer)
-	* [3.2 Convolutional Layers](#32-convolutional-layers)  
-	* [3.3 Dense Layers](#33-dense-layers)
-	* [3.4 Output Layer](#34-output-layer)
-	* [3.5 Deep Learning](#35-deep-learning)
-4. [Model Validation](#4-model-validation)
-	* [4.1 Performance](#41-performance)
-	* [4.2 Analysis](#42-analysis)
-	* [4.3 Computer Vision](#43-computer-vision)
-5. [The Apps](#5-the-apps)
-	* [5.1 RESTful API](#51-restful-api)
-	* [5.2 Interactive Web App](#52-interactive-web-app)
-	* [5.3 Real-Time Prediction via Webcam](#53-real-time-prediction-via-webcam)
-6. [About the Author](#7-about-the-author)
-7. [References](#8-references)
+1. [Abstract](#1-abstract)
+2. [Introduciton](#2-introduction)
+	* [2.1 Motivation](#21-motivation)
+	* [2.2 Description of Proposed Approach](#22-description-of-proposed-approach)  
+	* [2.3 Database: HAPPEI](#23-database-happei)
+3. [Background Knowledge](#3-background-knowledge)
+	* [3.1 Feed-forward Neural Network](#31-feed-forward-neural-network)
+	* [3.2 Convolutional Neural Network](#32-convolutional-neural-network)
+	* [3.3 Recurrent Neural Network: Long-Short Term Memory](#33-recurrent-neural-network:-long-short-term-memory)
+4. [Our Approach and Methodology](#4-our-approach-and-methodology)
+	* [4.1 Face Detection](#41-face-detection)
+	* [4.2 Residual Network (ResNet)](#42-residual-network-(resnet))
+	* [4.3 Random Recurrent Deep Ensembles (RRDE)](#43-random-recurrent-deep-ensembles-(rrde))
+	* [4.4 LSTM based Feature Aggregation](#44-lstm-based-feature-aggregation)
+	* [4.5 Group Emotion Model (GEM)](#45-group-emotion-model-(gem))
+5. [Experiments](#5-experiments)
+	* [5.1 Facial Feature Extraction](#51-facial-feature-extraction)
+	* [5.2 Facial Feature Aggregation](#52-facial-feature-aggregation)
+	* [5.3 Group Emotion Modeling](#53-group-emotion-modeling)
+	* [5.4 Regression](#54-regression)
+6. [Application](#6-application)
+7. [About the Author](#7-about-the-author)
+8. [References](#8-references)
 
 ## 1 Abstract
 In this project, we present a novel ensemble framework to extract highly discriminative feature representation of image and its application for group-level happiness intensity prediction in wild. In order to generate enough diversity of decisions, we train n convolutional neural networks by bootstrapping the training set and extract n features for each image from them. A recurrent network is then used to remember which network extracts better feature and generate the final feature representation for one individual image. We use several group emotion models (GEM) to aggregate face features in a group and use fine-tuned support vector regression (SVR) to get the final results. Through extensive experiments, the great effectiveness of our Random Recurrent Deep Ensembles (RRDE) are demonstrated in both structural and decisional ways. Our best result yields a 0.55  root-mean-square error (RMSE) on validation set of HAPPEI dataset, significantly better than the baseline of 0.78. Meanwhile, I also build an online RESTful API called GREP (GRoup Emotion Parser) and a website for demonstration purpose. The whole project is based on the undergraduate thesis of ___Yichen PAN___.
@@ -70,154 +75,94 @@ Long short-term memory (LSTM) is a special kind of RNN architecture proposed in 
 <h4 align="center"> Figure 3.3 The single-layer repeating module in a standard RNN.</h4>
 </p>
 
-## 3 The Model
+### 3.4 Ensemble LearningEnsemble learning methods are focused on obtaining better predictive performance by using multiple learning algorithms. Common types of ensembles include bootstrap aggregating (Bagging) [5], boosting [35], and stacking [68].
+
+## 4. Our Approach and Methodology
+### 4.1 Face Detection
+we conduct face detection by ourselves using OpenCV’s Viola-Jones frontal face detector [64]. We set the minimum face size to 25 × 25 pixels, and use the Intraface library [70] to detect 49 facial points. We discard false positive faces based on the score of the alignment model provided by Intraface; any detection with a score lower than 0.3 is considered a non-face.
 
 
-Deep learning is a popular technique used in computer vision. I chose convolutional neural network (CNN) layers as building blocks to create my model architecture. CNNs are known to imitate how the human brain works when analyzing visuals. I will use a picture of Mr. Bean as an example to explain how images are fed into the model, because who doesn’t love Mr. Bean?
-
-A typical architecture of a convolutional neural network will contain an input layer, some convolutional layers, some dense layers (aka. fully-connected layers), and an output layer (Figure 4). These are linearly stacked layers ordered in sequence. In [Keras](https://keras.io/models/sequential/), the model is created as `Sequential()` and more layers are added to build architecture.
-
+### 4.2 Residual Network (ResNet)
+ResNet is a deep CNN architecture, proposed by [27]. In their design, the plain baselines (Figure 3.4, middle) are mainly based on the VGG nets [57] (Figure 3.4, left). The convolutional layers mostly have 3×3 filters and adhere to the two design rules: (i) layers have the same number of filters for the same output feature map size; and (ii) if the feature map size is halved, the number of filters is doubled so as to preserve the time complexity per layer. Downsampling is performed directly by convolutional layers that have a stride of 2. The network ends with a global average pooling layer and a 1000-way fully-connected softmax layer. The total number of weighted layers is 34 in Fig. 3.4 (middle).
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/netarch.png" width="650" align="middle"/>
-<h4 align="center">Figure 4. Facial Emotion Recognition CNN Architecture (modification from Eindhoven University of Technology-PARsE).</h4>
+<img src="img/resnet.png" width="400" align="middle"/>
+<h4 align="center"> Example network architectures of normal CNN and ResNet-34 for ImageNet: Left: the VGG-19 model \cite{simonyan2014very} (19.6 billion FLOPs) as a reference. Middle: a plain network with 34 parameter layers (3.6 billion FLOPs). Right: a residual network with 34 parameter layers (3.6 billion FLOPs). The dotted shortcuts increase dimensions.</h4>
 </p>
 
-###3.1 Input Layer
-+ The input layer has pre-determined, fixed dimensions, so the image must be __pre-processed__ before it can be fed into the layer. I used [OpenCV](http://docs.opencv.org/3.1.0/d7/d8b/tutorial_py_face_detection.html#gsc.tab=0), a computer vision library, for face detection in the image. The `haar-cascade_frontalface_default.xml` in OpenCV contains pre-trained filters and uses `Adaboost` to quickly find and crop the face.
-+ The cropped face is then converted into grayscale using `cv2.cvtColor` and resized to 48-by-48 pixels with `cv2.resize`. This step greatly reduces the dimensions compared to the original RGB format with three color dimensions (3, 48, 48).  The pipeline ensures every image can be fed into the input layer as a (1, 48, 48) numpy array.
+### 4.3 Random Recurrent Deep Ensembles (RRDE)
+Inspired by the work of [43], in our RRDE framework, we first train n CNNs for each image, then extract one vector representation from each network, and finally aggregate n feature vectors for each image into one compact feature vector using LSTM.
 
-###3.2 Convolutional Layers
-+ The numpy array gets passed into the `Convolution2D` layer where I specify the number of filters as one of the hyperparameters. The __set of filters__(aka. kernel) are unique with randomly generated weights. Each filter, (3, 3) receptive field, slides across the original image with __shared weights__ to create a __feature map__.
-+  __Convolution__ generates feature maps that represent how pixel values are enhanced, for example, edge and pattern detection. In Figure 5, a feature map is created by applying filter 1 across the entire image. Other filters are applied one after another creating a set of feature maps.
-
+### 4.4 LSTM based Feature Aggregation
+One straightforward way to aggregate the features is mean encoding. However, due to the diversity of these CNNs, for the same image, the difference between features extracted by different network can be huge. Extreme values have large impact on the final result. Therefore, mean encoding is not an ideal method for aggregation in this case. Inspired by the success of LSTM in sequencing learning [52], it is believed that LSTM can be used for aggregating these features. A cell memory C is used to memorize good feature representation of face feature vectors when scanning the sequence of feature vectors. The forget gate will decide how much of the content in the cell memory should be forgotten and the input gate in LSTM is employed to determine how much the new feature should be fed into the cell memory. The output gate decides how the features in the cell memory are converted to output features. The pipeline for LSTM based feature aggregation is shown in Figure 3.5.
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/conv_maxpool.png" width="600" align="middle"/>
-<h4 align="center">Figure 5. Convolution and 1st max-pooling used in the network</h4>
+<img src="img/LSTM_pipeline2.png" width="600" align="middle"/>
+<h4 align="center"> LSTM based feature aggregation pipeline. </h4>
 </p>
 
-+ __Pooling__ is a dimension reduction technique usually applied after one or several convolutional layers. It is an important step when building CNNs as adding more convolutional layers can greatly affect computational time. I used a popular pooling method called `MaxPooling2D` that uses (2, 2) windows across the feature map only keeping the maximum pixel value. The pooled pixels form an image 
-with dimentions reduced by 4.
+### 4.5 Group Emotion Model (GEM)After obtaining aggregated feature representation of each individual face in an image, we now combine them in order to get an estimation of the overall happiness of the group in image. In this subsection we discuss our GEMs for group-level estimation before feeding into the final regressor:
 
-###3.3 Dense Layers
-+ The dense layer (aka fully connected layers), is inspired by the way neurons transmit signals through the brain. It takes a large number of input features and transform features through layers connected with trainable weights.
-
+* ___Mean of Face-level Estimations___: One naive way for overall group-level happiness estimation is to use the mean of all face-level estimations in the group as introduced by [13].
+* ___Mean Encoding___: Another straight forward feature aggregation is mean encoding. We use the average of the face features as the feature representation of the whole image.* ___Context-based Weighted GEM___: In above two GEMs, both local information, such as the level of occlusion of a face, and global information, such as the relative position of people in the image, are ignored. In this case, the effectiveness is compromised because all detected faces are assumed to contribute equally to the group-level estimation, which has been shown not generally the case [13]. In the context-based weighted GEM, social context features are incorporated when estimating the group happiness intensity by normalizing the occlusion level of a face by the sum of its Eu- clidean distance from all other faces. In this case, small faces which are located away from the group are penalized, while larger faces which are closer to all others are as- signed a higher significance. If n = 1, then significance is set to 1. In the experiment, this context-based weight scheme is further cooperated together with mean of face-level estimation and mean encoding GEM.## 5. Experiments
+The whole pipeline framework of our RRDE based system is shown in Figure 5.1. There are four main stages including feature extraction, feature aggregation, using GEMs to leverage individual-level features, and finally performing regression to make estimations.
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/forward_back_prop.png" width="750" align="middle"/>
-<h4 align="center">Figure 6. Neural network during training: Forward propagation (left) to Backward propagation (right).</h4>
+<img src="img/framework_no_boundary.png" width="600" align="middle"/>
+<h4 align="center"> Figure 5.1: The whole framework of proposed RRDE system. </h4>
 </p>
 
-+ These weights are trained by forward propagation of training data then backward propagation of its errors. __Back propagation__ starts from evaluating the difference between prediction and true value, and back calculates the weight adjustment needed to every layer before. We can control the training speed and the complexity of the architecture by tuning the hyper-parameters, such as __learning rate__ and __network density__. As we feed in more data, the network is able to gradually make adjustments until errors are minimized. 
-+ Essentially, the more layers/nodes we add to the network the better it can pick up signals. As good as it may sound, the model also becomes increasingly prone to overfitting the training data. One method to prevent overfitting and generalize on unseen data is to apply __dropout__. Dropout randomly selects a portion (usually less than 50%) of nodes to set their weights to zero during training. This method can effectively control the model's sensitivity to noise during training while maintaining the necessary complexity of the architecture.
+The experiment environment is set in Python 2.7.10 with a number of toolkits includ- ing Theano(0.8.2), Scikit-learn(0.18.1), Numpy(1.12.0), Tensorflow(1.0.1) and etc. The training process is accelerated using GPUs.
 
-###3.4 Output Layer
-+ Instead of using sigmoid activation function, I used **softmax** at the output layer. This output presents itself as a probability for each emotion class.
-+ Therefore, the model is able to show the detail probability composition of the emotions in the face. As later on, you will see that it is not efficient to classify human facial expression as only a single emotion. Our expressions are usually much complex and contain a mix of emotions that could be used to accurately describe a particular expression.
+### 5.1 Facial Feature Extraction
+Since HAPPEI database is of relative small size, using deeper network like ResNet-50 or ResNet-101 will result in overfitting easily. After experiments, a 20-layer ResNet is finally trained, which has the same structure as the one trained by [27] on Cifar-10 database. Cifar-10 database consists of 60000 images and 10 classes [39].
 
-> It is important to note that there is no specific formula to building a neural network that would guarantee to work well. Different problems would require different network architecture and a lot of trail and errors to produce desirable validation accuracy. __This is the reason why neural nets are often perceived as "black box algorithms."__ But don't be discouraged. Time is not wasted when experimenting to find the best model and you will gain valuable experience. 
-
-###3.5 Deep Learning
-I built a simple CNN with an input, three convolution layers, one dense layer, and an output layer to start with. As it turned out, the simple model preformed poorly. The low accuracy of 0.1500 showed that it was merely random guessing one of the six emotions. The simple net architecture failed to pick up the subtle details in facial expressions. This could only mean one thing...
-
+Particularly, the basic residual architecture follows the form in Figure 3.4 (right), but we adopt a simpler version called ResNet-20. The network inputs to our 20-layer ResNet are 32 × 32 × 32 images, with every pixel value scaled to [−1, 1]. Then we use a stack of 6n (n equal to 3 in our RresNet-20) layers with 3 × 3 convolutions on the feature maps of sizes 32, 16, 8 respectively. As a result, there are 2n layers for each feature map size. The numbers of filters are 16,32,64 respectively. Convolutions with a stride of 2 are used to conduct subsampling. Finally, the network ends with a global average pooling, a 10-way fully-connected layer, and softmax. There are in total 6n + 2 (equal to 20) stacked weighted layers. Table 4.2 summarizes the architecture, and Figure 4.2 shows the architecture of ResNet-20.
+Shortcut connections are connected to the pairs of 3 × 3 layers (totally 3n shortcuts). For each face image, it is forwarded through the whole network. The activations from the penultimate layer is extracted as face image representation. The dimension of the extracted face feature is 64.
+When training the network, a weight decay of 0.00001 is used. The initial learning rate is 0.01 and the batch size is 32. The network is trained for 20000 iterations in total and for every 5000 iterations, learning rate is multiplied by 0.1. Measuring happiness is a regression problem, so it is supposed to use Squared Hinge Loss (L2-loss) in this problem, but since the interests are only in the feature extracted by CNN, cross entropy loss can also be used. In the experiment, the feature extracted by the network with cross entropy loss are found to be better than L2-loss. Therefore cross entropy loss is used with 6 classes as the final loss layer. Bilinear interpolation is used to resize these images and randomly adjust the brightness, contrast, saturation when training so the data set is augmented to train a more robust network. In total, there are n networks and n feature representations for each image.
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/inception.png" width="500" align="middle"/>
+<img src="img/resnet20.png" width="200" align="middle"/>
+<h4 align="center"> Figure 5.2: ResNet-20 architecture. </h4>
 </p>
 
-This is where deep learning comes in. Given the pattern complexity of facial expressions, it is necessary to build with a deeper architecture in order to identify subtle signals. So I fiddled combinations of three components to increase model complexity: 
-+ __number and configuraton of convolutional layers__
-+ __number and configuration of dense layers__ 
-+ __dropout percentage in dense layers__
+### 5.2 Facial Feature AggregationLSTM is used to scan features extracted by ResNet-20. Two cells are stacked into the LSTM unit, and the memory size for each cell is 128. The order of scanning these features is the same so that LSTM can remember which network extracts better feature for a specific image. For every face image in the whole database, it is fed to n networks and get n 64-dimensional feature vectors. Then LSTM scans these vectors and L2-loss is used as loss function when training. Finally, a 128-dimensional vector is extracted from the final LSTM output for the final group happiness intensity analysis.In order to prove the effectiveness of the proposed RRDE method, a single ResNet-20 is trained using all training data of HAPPEI with the L2-loss as loss function, to compare with a RRDE. All the parameters of this single ResNet are the same as ResNets in the ensemble except for the iteration changed from 20000 to 30000. The result is shown in Figure 4.4. This single ResNet is named as ResNet-20-All because it will be used again in the group-level happiness estimation comparison.
 
-Models with various combinations were trained and evaluated using GPU computing `g2.2xlarge` on Amazon Web Services (AWS). This greatly reduced training time and increased efficiency in tuning the model (Pro tip: use _automation script_ and _tmux detach_ to train on AWS EC2 instance over night). In the end, my final net architecture was 9 layers deep in convolution with one max-pooling after every three convolution layers as seen in Figure 7.
-
+### 5.3 Group Emotion Modeling
+After getting one efficient feature representation for each face image, the effectiveness of four GEMs mentioned in Chapter 3 is tested. As shown in Figure 5.3, for each of four GEMs, including normal mean-encoding, normal mean of face-level estimations, context-based weighted mean-encoding and mean of face-level estimations, the model with different features extracted from ensembles of different size is tested.
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/mynetarch.png" width="850" align="middle"/>
-<h4 align="center">Figure 7. Final model CNN architecture.</h4>
+<img src="img/table4-3.png" width="600" align="middle"/>
+<h4 align="center"> Figure 5.3: Results of GEMs on the validation set. </h4>
 </p>
 
-## 4 Model Validation
+### 5.4 Regression
+The grid search combined with cross-validation is used to find the optimal parameters of each regressor. As shown in the Figure 5.4 and Figure 5.5 below, the optimal regressor is a SVR with penalty parameter C equal to 0.5, epsilon E equal to 0.13 and kernel type chosen as linear. For SVR, the penalty parameter C is ranged from 0.5 to 1.5, epsilon E is ranged from 0.05 to 0.15 and kernel function is chosen from linear, poly, rbf and sigmoid. In terms of Logistic Regression, the penalty parameter C is ranged from 0.5 to 1.5, the solver function is chosen from newton-cg, lbfgs, liblinear and sag.
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/works_every_time.png" width="500" align="middle"/>
-</p>
-
-###4.1 Performance
-As it turns out, the final CNN had a __validation accuracy of 58%__. This actually makes a lot of sense. Because our expressions usually consist a combination of emotions, and _only_ using one label to represent an expression can be hard. In this case, when the model predicts incorrectly, the correct label is often the __second most likely emotion__ as seen in Figure 8 (examples with light blue labels).
-
-<p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/predictions.png" width="850" align="middle"/>
-<h4 align="center">Figure 8. Prediction of 24 example faces randomly selected from test set.</h4>
-</p>
-
-###4.2 Analysis
- 
-<p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/confusion_matrix.png" width="400" align="middle"/>
-<h4 align="center">Figure 9. Confusion matrix for true and prediction emotion counts.</h4>
-</p>
-
-Let's take a closer look at predictions for individual emotions. Figure 9 is the confusion matrix for the model predictions on the test set. The matrix gives the counts of emotion predictions and some insights to the performance of the multi-class classification model:
-+ The model performs really well on classifying **positive emotions** resulting in relatively high precision scores for happy and surprised. **Happy** has a precision of 76.7% which could be explained by having the most examples (~7000) in the training set. Interestingly, **surprise** has a precision of 69.3% having the least examples in the training set. There must be very strong signals in the suprise expressions. 
-+ Model performance seems weaker across **negative emotions** on average. In particularly, the emotion **sad** has a low precision of only 39.7%. The model frequently misclassified angry, fear and neutral as sad. In addition, it is most confused when predicting sad and neutral faces because these two emotions are probably the least expressive (excluding crying faces).  
-+ Frequency of prediction that misclassified by less than 3 ranks.
-
-<p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/correct_emotion.png" width="250" align="middle"/>
-<h4 align="center">Figure 10. Correct predictions on 2nd and 3rd highest probable emotion.</h4>
-</p>
-
-###4.3 Computer Vision
-As a result, the feature maps become increasingly abstract down the pipeline when more pooling layers are added. Figure 11 and 12 gives an idea of what the machine sees in feature maps after 2nd and 3rd max-pooling. [__Deep nets are beautiful!__](https://research.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html). 
-
-**Code for analysis and visualiation of the inter-layer outputs in the convolutional neural net:** https://github.com/JostineHo/mememoji/blob/master/data_visualization.ipynb
-
-<p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/L4_compviz.png" width="800"align="middle"/>
-<h4 align="center">Figure 11. CNN (64-filter) feature maps after 2nd layer of max-pooling.</h4>
+<img src="img/4pics.png" width="600" align="middle"/>
+<h4 align="center"> Figure 5.4: Confusion matrices of regressors. </h4>
 </p>
 
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/conv128pool3.png" width="600" align="middle"/>
-<h4 align="center">Figure 12. CNN (128-filter) feature maps after 3nd layer of max-pooling.</h4>
+<img src="img/table4-4.png" width="600" align="middle"/>
+<h4 align="center"> Figure 5.5: Comparison of regressors. </h4>
 </p>
 
-## 5 The Apps
+I present some example outputs of our RRDE based GEA system. The group image in the example is taken from the validation set of HAPPEI database. The group in the image consists both females and males, the young and the old, the long hair and short hair, the one with glasses and the one without glasses, as shown in Figure 5.6. The result from Figure 5.7 shows that our system generalizes well on diverse images.
 <p align="center">
-<img src="https://github.com/JostineHo/mememoji/blob/master/figures/system.png" width="500" align="middle"/>
-<h4 align="center">Figure 13. Web application and REST API.</h4>
+<img src="img/example.png" width="600" align="middle"/>
+<h4 align="center"> Figure 5.6: An example of emotion analysis on HAPPEI database. </h4>
 </p>
 
-###5.1 REST API
-I built a REST API that finds human faces within images and make prediction about each facial emotion in `POST /v1.0.0/predict`. You can paste the url of an image in `image_url` or drag-and-drop an image file to `image_buf `. In addition, you have the option to have the API return the image with annotated faces and cropped thumbnail of each face in base64 by using the dropdown menu in `annotate_image` and `crop_image`. The API returns the probabilities of emotions for each face (indexed) and an unique ID for each image in json format. MongoDB is installed to store input into facial expression database on EC2 for future training. 
+<p align="center">
+<img src="img/table4-6.png" width="600" align="middle"/>
+<h4 align="center"> Figure 5.7: Result for the example. </h4>
+</p>
 
-`POST /v1.0.0/feedback` can be used to collect user feedback from the web app for incorrect predictions. Developers have to option to send back user feedback (true emotion) by providing the unique ID and face index. The built-in MongoDB will use unique ID `image_id` to find the document and `face_index` to append the true emotion as `feedback` in the database.
+## 6 Application
+For demonstration and future research purpose, a set of RESTful APIs and an interactive web application are set. The backend is built using Flask in Python.
 
-**Source Code:** https://github.com/JostineHo/mememoji_api
+**Source Code:** [GRoup Emotion Parser (GREP)](https://github.com/PAN001/GREP/tree/restful_api)
 
-**Demo:** [mememoji.rhobota.com](mememoji.rhobota.com)
+**Demo:** [grep.net.cn](https://grep.net.cn)
 
-###5.2 Interactive Web App
-**Mememoji** is an interactive emotion recognition system that detects emotions based on facial expressions. This app uses the REST API to predict the compositions of the emotions expressed by users. Users have the option to paste image url, upload your own image, or simply turn on your webcam to interact with the app. Users can also provide feedback by selecting the correct emotion from a dropdown menu should the convolutional neural network predicts incorrectly. This will serve as a training sample and help improve the algorithm in the future.
+## 7 About the Author
 
-_Special thanks to Chris Impicciche, Web Development Fellow at Galvanize, who made it possible for online demo of the technology._
+**Yichen PAN** is a data scientist who loves building intelligent applications and exploring the exciting possibilities using deep learning. She is interested in computer vision and automation that creates innovative solutions to real-world problems. She holds a masters degree in Petroleum & Geosystems Engineering at The University of Texas at Austin. You can reach her on [LinkedIn](https://www.linkedin.com/in/jostinefho).
 
-**Source Code:** [FaceX](https://github.com/Peechiz/FaceX)
-
-**Demo:** [mememoji.me](https://mememoji.me/)
-
-###5.3 Real-Time Prediction via Webcam
-In addition, I built a real-time facial emotion analyzer that can be accessed through a webcam. `real-time.py` overlays a meme face matching the emotion expressed in real-time. `live-plotting` outputs a live-recording graph that responds to the changes in facial expressions. The program uses OpenCV for face detection and the trained neural network for live prediction.
-
-**Source Code**: [https://github.com/JostineHo/real-time_emotion_analyzer](https://github.com/JostineHo/real-time_emotion_analyzer)
-
-## 6 About the Author
-
-**Jostine Ho** is a data scientist who loves building intelligent applications and exploring the exciting possibilities using deep learning. She is interested in computer vision and automation that creates innovative solutions to real-world problems. She holds a masters degree in Petroleum & Geosystems Engineering at The University of Texas at Austin. You can reach her on [LinkedIn](https://www.linkedin.com/in/jostinefho).
-
-## 7 References
-
-1. [*"Dataset: Facial Emotion Recognition (FER2013)"*](https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data) ICML 2013 Workshop in Challenges in Representation Learning, June 21 in Atlanta, GA.
-
-2. [*"Andrej Karpathy's Convolutional Neural Networks (CNNs / ConvNets)"*](http://cs231n.github.io/convolutional-networks/) Convolutional Neural Networks for Visual Recognition (CS231n), Stanford University.
-
-3. Srivastava et al., 2014. *"Dropout: A Simple Way to Prevent Neural Networks from Overfitting"*, Journal of Machine Learning Research, 15:1929-1958.
-
-4. Duncan, D., Shine, G., English, C., 2016. [*"Report: Facial Emotion Recognition in Real-time"*](http://cs231n.stanford.edu/reports2016/022_Report.pdf) Convolutional Neural Networks for Visual Recognition (CS231n), Stanford University.
+## 8 References
