@@ -75,7 +75,8 @@ Long short-term memory (LSTM) is a special kind of RNN architecture proposed in 
 <h4 align="center"> Figure 3.3 The single-layer repeating module in a standard RNN.</h4>
 </p>
 
-### 3.4 Ensemble LearningEnsemble learning methods are focused on obtaining better predictive performance by using multiple learning algorithms. Common types of ensembles include bootstrap aggregating (Bagging) [2], boosting [7], and stacking [17].
+### 3.4 Ensemble Learning
+Ensemble learning methods are focused on obtaining better predictive performance by using multiple learning algorithms. Common types of ensembles include bootstrap aggregating (Bagging) [2], boosting [7], and stacking [17].
 
 ## 4. Our Approach and Methodology
 ### 4.1 Face Detection
@@ -99,10 +100,15 @@ One straightforward way to aggregate the features is mean encoding. However, due
 <h4 align="center"> Figure 4.2: LSTM based feature aggregation pipeline. </h4>
 </p>
 
-### 4.5 Group Emotion Model (GEM)After obtaining aggregated feature representation of each individual face in an image, we now combine them in order to get an estimation of the overall happiness of the group in image. In this subsection we discuss our GEMs for group-level estimation before feeding into the final regressor:
+### 4.5 Group Emotion Model (GEM)
+After obtaining aggregated feature representation of each individual face in an image, we now combine them in order to get an estimation of the overall happiness of the group in image. In this subsection we discuss our GEMs for group-level estimation before feeding into the final regressor:
 
 * ___Mean of Face-level Estimations___: One naive way for overall group-level happiness estimation is to use the mean of all face-level estimations in the group as introduced by [4].
-* ___Mean Encoding___: Another straight forward feature aggregation is mean encoding. We use the average of the face features as the feature representation of the whole image.* ___Context-based Weighted GEM___: In above two GEMs, both local information, such as the level of occlusion of a face, and global information, such as the relative position of people in the image, are ignored. In this case, the effectiveness is compromised because all detected faces are assumed to contribute equally to the group-level estimation, which has been shown not generally the case [4]. In the context-based weighted GEM, social context features are incorporated when estimating the group happiness intensity by normalizing the occlusion level of a face by the sum of its Eu- clidean distance from all other faces. In this case, small faces which are located away from the group are penalized, while larger faces which are closer to all others are assigned a higher significance. If n = 1, then significance is set to 1. In the experiment, this context-based weight scheme is further cooperated together with mean of face-level estimation and mean encoding GEM.## 5. Experiments
+* ___Mean Encoding___: Another straight forward feature aggregation is mean encoding. We use the average of the face features as the feature representation of the whole image.
+* ___Context-based Weighted GEM___: In above two GEMs, both local information, such as the level of occlusion of a face, and global information, such as the relative position of people in the image, are ignored. In this case, the effectiveness is compromised because all detected faces are assumed to contribute equally to the group-level estimation, which has been shown not generally the case [4]. In the context-based weighted GEM, social context features are incorporated when estimating the group happiness intensity by normalizing the occlusion level of a face by the sum of its Eu- clidean distance from all other faces. In this case, small faces which are located away from the group are penalized, while larger faces which are closer to all others are assigned a higher significance. If n = 1, then significance is set to 1. In the experiment, this context-based weight scheme is further cooperated together with mean of face-level estimation and mean encoding GEM.
+
+
+## 5. Experiments
 The whole pipeline framework of our RRDE based system is shown in Figure 5.1. There are four main stages including feature extraction, feature aggregation, using GEMs to leverage individual-level features, and finally performing regression to make estimations.
 <p align="center">
 <img src="img/framework_no_boundary.png" width="600" align="middle"/>
@@ -115,14 +121,18 @@ The experiment environment is set in Python 2.7.10 with a number of toolkits inc
 Since HAPPEI database is of relative small size, using deeper network like ResNet-50 or ResNet-101 will result in overfitting easily. After experiments, a 20-layer ResNet is finally trained, which has the same structure as the one trained by [5] on Cifar-10 database. Cifar-10 database consists of 60000 images and 10 classes [8].
 
 Particularly, the basic residual architecture follows the form in Figure 4.1 (right), but we adopt a simpler version called ResNet-20. The network inputs to our 20-layer ResNet are 32 × 32 × 32 images, with every pixel value scaled to [−1, 1]. Then we use a stack of 6n (n equal to 3 in our RresNet-20) layers with 3 × 3 convolutions on the feature maps of sizes 32, 16, 8 respectively. As a result, there are 2n layers for each feature map size. The numbers of filters are 16,32,64 respectively. Convolutions with a stride of 2 are used to conduct subsampling. Finally, the network ends with a global average pooling, a 10-way fully-connected layer, and softmax. There are in total 6n + 2 (equal to 20) stacked weighted layers. Table 4.2 summarizes the architecture, and Figure 4.2 shows the architecture of ResNet-20.
-Shortcut connections are connected to the pairs of 3 × 3 layers (totally 3n shortcuts). For each face image, it is forwarded through the whole network. The activations from the penultimate layer is extracted as face image representation. The dimension of the extracted face feature is 64.
-When training the network, a weight decay of 0.00001 is used. The initial learning rate is 0.01 and the batch size is 32. The network is trained for 20000 iterations in total and for every 5000 iterations, learning rate is multiplied by 0.1. Measuring happiness is a regression problem, so it is supposed to use Squared Hinge Loss (L2-loss) in this problem, but since the interests are only in the feature extracted by CNN, cross entropy loss can also be used. In the experiment, the feature extracted by the network with cross entropy loss are found to be better than L2-loss. Therefore cross entropy loss is used with 6 classes as the final loss layer. Bilinear interpolation is used to resize these images and randomly adjust the brightness, contrast, saturation when training so the data set is augmented to train a more robust network. In total, there are n networks and n feature representations for each image.
+
+Shortcut connections are connected to the pairs of 3 × 3 layers (totally 3n shortcuts). For each face image, it is forwarded through the whole network. The activations from the penultimate layer is extracted as face image representation. The dimension of the extracted face feature is 64.
+
+When training the network, a weight decay of 0.00001 is used. The initial learning rate is 0.01 and the batch size is 32. The network is trained for 20000 iterations in total and for every 5000 iterations, learning rate is multiplied by 0.1. Measuring happiness is a regression problem, so it is supposed to use Squared Hinge Loss (L2-loss) in this problem, but since the interests are only in the feature extracted by CNN, cross entropy loss can also be used. In the experiment, the feature extracted by the network with cross entropy loss are found to be better than L2-loss. Therefore cross entropy loss is used with 6 classes as the final loss layer. Bilinear interpolation is used to resize these images and randomly adjust the brightness, contrast, saturation when training so the data set is augmented to train a more robust network. In total, there are n networks and n feature representations for each image.
 <p align="center">
 <img src="img/resnet20.png" width="200" align="middle"/>
 <h4 align="center"> Figure 5.2: ResNet-20 architecture. </h4>
 </p>
 
-### 5.2 Facial Feature AggregationLSTM is used to scan features extracted by ResNet-20. Two cells are stacked into the LSTM unit, and the memory size for each cell is 128. The order of scanning these features is the same so that LSTM can remember which network extracts better feature for a specific image. For every face image in the whole database, it is fed to n networks and get n 64-dimensional feature vectors. Then LSTM scans these vectors and L2-loss is used as loss function when training. Finally, a 128-dimensional vector is extracted from the final LSTM output for the final group happiness intensity analysis.In order to prove the effectiveness of the proposed RRDE method, a single ResNet-20 is trained using all training data of HAPPEI with the L2-loss as loss function, to compare with a RRDE. All the parameters of this single ResNet are the same as ResNets in the ensemble except for the iteration changed from 20000 to 30000. The result is shown in Figure 4.4. This single ResNet is named as ResNet-20-All because it will be used again in the group-level happiness estimation comparison.
+### 5.2 Facial Feature Aggregation
+LSTM is used to scan features extracted by ResNet-20. Two cells are stacked into the LSTM unit, and the memory size for each cell is 128. The order of scanning these features is the same so that LSTM can remember which network extracts better feature for a specific image. For every face image in the whole database, it is fed to n networks and get n 64-dimensional feature vectors. Then LSTM scans these vectors and L2-loss is used as loss function when training. Finally, a 128-dimensional vector is extracted from the final LSTM output for the final group happiness intensity analysis.
+In order to prove the effectiveness of the proposed RRDE method, a single ResNet-20 is trained using all training data of HAPPEI with the L2-loss as loss function, to compare with a RRDE. All the parameters of this single ResNet are the same as ResNets in the ensemble except for the iteration changed from 20000 to 30000. The result is shown in Figure 4.4. This single ResNet is named as ResNet-20-All because it will be used again in the group-level happiness estimation comparison.
 
 ### 5.3 Group Emotion Modeling
 After getting one efficient feature representation for each face image, the effectiveness of four GEMs mentioned in Chapter 3 is tested. As shown in Figure 5.3, for each of four GEMs, including normal mean-encoding, normal mean of face-level estimations, context-based weighted mean-encoding and mean of face-level estimations, the model with different features extracted from ensembles of different size is tested.
@@ -165,28 +175,46 @@ For demonstration and future research purpose, a set of RESTful APIs and an inte
 
 **Yichen PAN** is an undergraduate student at University of Nottingham Ningbo China, and master candidate at Carnegie Mellon University. He has been devoted to being computer scientist since the university. Constantly involved in interdisciplinary research in computer science. Interested in programable data collection, process and analysis, machine learning, NLP and deep learning. Experienced in application development.
 
-[LinkedIn](https://www.linkedin.com/in/yichegn-pan-512399a7/) 
+[LinkedIn](https://www.linkedin.com/in/yichenpan/) 
 
 [Website](http://panatopos.com)
 
 ## 8 References
-[1] Bishop, C. M. Pattern recognition. Machine Learning 128 (2006), 1–58.
-[2] Breiman, L. Bagging predictors. Machine learning 24, 2 (1996), 123–140.
-[3] Dhall, A., Asthana, A., and Goecke, R. Facial expression based automatic album creation. In International Conference on Neural Information Processing (2010), Springer, pp. 485–492.
-[4] Dhall, A., Goecke, R., and Gedeon, T. Automatic group happiness intensity analysis. IEEE Transactions on Affective Computing 6, 1 (2015), 13–26.
-[5] He, K., Zhang, X., Ren, S., and Sun, J. Deep residual learning for image recog- nition. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (2016), pp. 770–778.
-[6] Hochreiter, S., and Schmidhuber, J. Long short-term memory. Neural com- putation 9, 8 (1997), 1735–1780.
-[7] Kearns, M., and Valiant, L. Cryptographic limitations on learning boolean formulae and finite automata. Journal of the ACM (JACM) 41, 1 (1994), 67–95.
-[8] Krizhevsky, A., and Hinton, G. Learning multiple layers of features from tiny images.
-[9] Krizhevsky, A., Sutskever, I., and Hinton, G. E. Imagenet classification with deep convolutional neural networks. In Advances in neural information pro- cessing systems (2012), pp. 1097–1105.
-[10] Lee, S., Prakash, S. P. S., Cogswell, M., Ranjan, V., Crandall, D., and Batra, D. Stochastic multiple choice learning for training diverse deep ensembles. In Advances in Neural Information Processing Systems (2016), pp. 2119–2127.
-[11] Russell, B. C., Torralba, A., Murphy, K. P., and Freeman, W. T. La- belme: a database and web-based tool for image annotation. International journal of computer vision 77, 1 (2008), 157–173.
+
+[1] Bishop, C. M. Pattern recognition. Machine Learning 128 (2006), 1–58.
+
+[2] Breiman, L. Bagging predictors. Machine learning 24, 2 (1996), 123–140.
+
+[3] Dhall, A., Asthana, A., and Goecke, R. Facial expression based automatic album creation. In International Conference on Neural Information Processing (2010), Springer, pp. 485–492.
+
+[4] Dhall, A., Goecke, R., and Gedeon, T. Automatic group happiness intensity analysis. IEEE Transactions on Affective Computing 6, 1 (2015), 13–26.
+
+[5] He, K., Zhang, X., Ren, S., and Sun, J. Deep residual learning for image recog- nition. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (2016), pp. 770–778.
+
+[6] Hochreiter, S., and Schmidhuber, J. Long short-term memory. Neural com- putation 9, 8 (1997), 1735–1780.
+
+[7] Kearns, M., and Valiant, L. Cryptographic limitations on learning boolean formulae and finite automata. Journal of the ACM (JACM) 41, 1 (1994), 67–95.
+
+[8] Krizhevsky, A., and Hinton, G. Learning multiple layers of features from tiny images.
+
+[9] Krizhevsky, A., Sutskever, I., and Hinton, G. E. Imagenet classification with deep convolutional neural networks. In Advances in neural information pro- cessing systems (2012), pp. 1097–1105.
+
+[10] Lee, S., Prakash, S. P. S., Cogswell, M., Ranjan, V., Crandall, D., and Batra, D. Stochastic multiple choice learning for training diverse deep ensembles. In Advances in Neural Information Processing Systems (2016), pp. 2119–2127.
+
+[11] Russell, B. C., Torralba, A., Murphy, K. P., and Freeman, W. T. La- belme: a database and web-based tool for image annotation. International journal of computer vision 77, 1 (2008), 157–173.
 
 [12] Sak, H., Senior, A. W., and Beaufays, F. Long short-term memory recurrent neural network architectures for large scale acoustic modeling. In Interspeech (2014), pp. 338–342.
-[13] Simonyan, K., and Zisserman, A. Very deep convolutional networks for large- scale image recognition. arXiv preprint arXiv:1409.1556 (2014).
-[14] Szegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., Anguelov, D., Erhan, D., Vanhoucke, V., and Rabinovich, A. Going deeper with convo- lutions. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (2015), pp. 1–9.
-[15] Vandal, T., McDuff, D., and El Kaliouby, R. Event detection: Ultra large- scale clustering of facial expressions. In Automatic Face and Gesture Recognition (FG), 2015 11th IEEE International Conference and Workshops on (2015), vol. 1, IEEE, pp. 1–8.
-[16] Viola, P., and Jones, M. J. Robust real-time face detection. International journal of computer vision 57, 2 (2004), 137–154.
-[17] Wolpert, D. H. Stacked generalization. Neural networks 5, 2 (1992), 241–259.
-[18] Xiong, X., and De la Torre, F. Supervised descent method and its applications to face alignment. In Proceedings of the IEEE conference on computer vision and pattern recognition (2013), pp. 532–539.
-[19] Zhu, X., and Ramanan, D. Face detection, pose estimation, and landmark localization in the wild. In Computer Vision and Pattern Recognition (CVPR), 2012 IEEE Conference on (2012), IEEE, pp. 2879–2886.
+
+[13] Simonyan, K., and Zisserman, A. Very deep convolutional networks for large- scale image recognition. arXiv preprint arXiv:1409.1556 (2014).
+
+[14] Szegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., Anguelov, D., Erhan, D., Vanhoucke, V., and Rabinovich, A. Going deeper with convo- lutions. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (2015), pp. 1–9.
+
+[15] Vandal, T., McDuff, D., and El Kaliouby, R. Event detection: Ultra large- scale clustering of facial expressions. In Automatic Face and Gesture Recognition (FG), 2015 11th IEEE International Conference and Workshops on (2015), vol. 1, IEEE, pp. 1–8.
+
+[16] Viola, P., and Jones, M. J. Robust real-time face detection. International journal of computer vision 57, 2 (2004), 137–154.
+
+[17] Wolpert, D. H. Stacked generalization. Neural networks 5, 2 (1992), 241–259.
+
+[18] Xiong, X., and De la Torre, F. Supervised descent method and its applications to face alignment. In Proceedings of the IEEE conference on computer vision and pattern recognition (2013), pp. 532–539.
+
+[19] Zhu, X., and Ramanan, D. Face detection, pose estimation, and landmark localization in the wild. In Computer Vision and Pattern Recognition (CVPR), 2012 IEEE Conference on (2012), IEEE, pp. 2879–2886.
