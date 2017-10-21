@@ -1,0 +1,1 @@
+python extract.py --net_number 5 --test_set val --loss softmax --model_path weights/5nets_model.npy --data_path ../HappeiDetectedFaces/validation_all_faces/
