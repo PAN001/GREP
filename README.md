@@ -169,7 +169,7 @@ For demonstration and future research purpose, a set of RESTful APIs and an inte
 
 **Source Code:** [GRoup Emotion Parser (GREP)](https://github.com/PAN001/GREP/tree/restful_api)
 
-**Demo:** [grep.net.cn](https://grep.net.cn)
+**Demo:** [grep.net.cn](https://18.188.109.208)
 
 ## 7 About the Author
 
